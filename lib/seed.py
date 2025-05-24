@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-# Script goes here!
-
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Company, Dev, Freebie
 
-engine = create_engine('sqlite:///freebies.db')
+# Use absolute path to ensure correct database location
+db_path = os.path.join(os.path.dirname(__file__), 'freebies.db')
+engine = create_engine(f'sqlite:///{db_path}')
 Session = sessionmaker(bind=engine)
 session = Session()
 

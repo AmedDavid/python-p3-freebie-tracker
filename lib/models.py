@@ -15,8 +15,8 @@ class Company(Base):
     id = Column(Integer(), primary_key=True)
     name = Column(String())
     founding_year = Column(Integer())
-    freebies = relationship('Freebie', backref=backref('company'))
-    devs = relationship('Dev', secondary='freebies', backref=backref('companies'))
+    freebies = relationship('Freebie', backref=backref('company', overlaps="company,freebies"))
+    devs = relationship('Dev', secondary='freebies', backref=backref('companies', overlaps="company,freebies"), overlaps="company,freebies")
 
     def __repr__(self):
         return f'<Company {self.name}>'
@@ -29,7 +29,7 @@ class Company(Base):
     def oldest_company(cls):
         from sqlalchemy.orm import Session
         from sqlalchemy import create_engine
-        engine = create_engine('sqlite:///freebies.db')
+        engine = create_engine(f'sqlite:///{os.path.join(os.path.dirname(__file__), "freebies.db")}')
         session = Session(bind=engine)
         return session.query(cls).order_by(cls.founding_year).first()
 
@@ -38,7 +38,7 @@ class Dev(Base):
 
     id = Column(Integer(), primary_key=True)
     name = Column(String())
-    freebies = relationship('Freebie', backref=backref('dev'))
+    freebies = relationship('Freebie', backref=backref('dev', overlaps="companies,devs"), overlaps="companies,devs")
 
     def __repr__(self):
         return f'<Dev {self.name}>'
